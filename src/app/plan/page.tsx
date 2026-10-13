@@ -60,8 +60,8 @@ Include:
       const data = await response.json()
       setPlan(data.result)
     } catch {
-   const errorMsg = await response.json().catch(() => ({}))
-setPlan('Error: ' + (errorMsg.error || 'Something went wrong'))
+ } catch {
+    setPlan('Something went wrong. Please try again.')
     }
     setLoading(false)
   }
