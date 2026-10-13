@@ -30,9 +30,12 @@ export default function PlanPage() {
     setAnswers(finalAnswers)
     setLoading(true)
     setPlan('')
-
-    const prompt = `You are an expert travel planner. Create a complete detailed trip plan:
-
+    try {
+      const res = await fetch('/api/plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: `You are an expert travel planner. Create a complete detailed trip plan:
 Destination: ${finalAnswers.destination}
 Duration: ${finalAnswers.duration} days
 Budget per person: ${finalAnswers.budget}
@@ -40,28 +43,13 @@ Number of travelers: ${finalAnswers.travelers}
 Interests: ${finalAnswers.interests}
 Travel style: ${finalAnswers.style}
 Flying from: ${finalAnswers.from}
-
-Include:
-1. FLIGHTS - Options, costs, best airlines
-2. HOTELS - 3 recommendations with prices
-3. DAY BY DAY ITINERARY - Morning, afternoon, evening for each day
-4. TOP TOURIST ATTRACTIONS - Must see places with tips
-5. RESTAURANTS - Best local food and restaurants
-6. PACKING LIST - Essential items
-7. BUDGET BREAKDOWN - All costs and total
-8. LOCAL TIPS - Currency, transport, safety, culture`
-
-    try {
-      const response = await fetch('/api/plan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
+Include: Flights, Hotels, Day by day itinerary, Tourist attractions, Restaurants, Packing list, Budget breakdown, Local tips`
+        }),
       })
-      const data = await response.json()
-      setPlan(data.result)
+      const data = await res.json()
+      setPlan(data.result || 'Something went wrong.')
     } catch {
- } catch {
-    setPlan('Something went wrong. Please try again.')
+      setPlan('Something went wrong. Please try again.')
     }
     setLoading(false)
   }
@@ -78,7 +66,7 @@ Include:
           <div style={{ background: 'white', borderRadius: '20px', padding: '2.5rem', border: '1px solid var(--color-mist)', boxShadow: '0 8px 40px rgba(59,42,26,0.06)' }}>
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
               {steps.map((_, i) => (
-                <div key={i} style={{ flex: 1, height: '4px', borderRadius: '2px', background: i <= step ? 'var(--color-moss)' : 'var(--color-mist)', transition: 'background 0.3s' }} />
+                <div key={i} style={{ flex: 1, height: '4px', borderRadius: '2px', background: i <= step ? 'var(--color-moss)' : 'var(--color-mist)' }} />
               ))}
             </div>
             <p style={{ color: 'var(--color-stone)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Question {step + 1} of {steps.length}</p>
