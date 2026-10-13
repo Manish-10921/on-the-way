@@ -64,10 +64,11 @@ export default function TripDetailPage() {
     if (!files || files.length === 0) return
     setUploading(true)
     for (const file of Array.from(files)) {
-      const fileName = `${Date.now()}-${file.name}`
-      await supabase.storage
-        .from('trip-photos')
-        .upload(`${id}/${fileName}`, file)
+      const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+const { error } = await supabase.storage
+  .from('trip-photos')
+  .upload(`${id}/${fileName}`, file, { cacheControl: '3600', upsert: true })
+if (error) console.error('Upload error:', error)
     }
     await fetchPhotos()
     setUploading(false)
