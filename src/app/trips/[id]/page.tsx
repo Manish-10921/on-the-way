@@ -24,6 +24,8 @@ export default function TripDetailPage() {
   const [trip, setTrip] = useState<Trip | null>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [photos, setPhotos] = useState<string[]>([])
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -37,9 +39,39 @@ export default function TripDetailPage() {
       if (error || !data) { router.push('/dashboard'); return }
       setTrip(data as Trip)
       setLoading(false)
+      fetchPhotos()
     }
     fetchTrip()
   }, [id, router])
+
+  const fetchPhotos = async () => {
+    const { data } = await supabase.storage
+      .from('trip-photos')
+      .list(`${id}/`)
+    if (data) {
+      const urls = data.map(file => {
+        const { data: urlData } = supabase.storage
+          .from('trip-photos')
+          .getPublicUrl(`${id}/${file.name}`)
+        return urlData.publicUrl
+      })
+      setPhotos(urls)
+    }
+  }
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+    setUploading(true)
+    for (const file of Array.from(files)) {
+      const fileName = `${Date.now()}-${file.name}`
+      await supabase.storage
+        .from('trip-photos')
+        .upload(`${id}/${fileName}`, file)
+    }
+    await fetchPhotos()
+    setUploading(false)
+  }
 
   const handleDelete = async () => {
     if (!confirm('Delete this trip?')) return
@@ -78,7 +110,6 @@ export default function TripDetailPage() {
     <div style={{ minHeight: '100vh', background: 'var(--color-cream)' }}>
       <Navbar />
 
-      {/* Hero */}
       <div style={{
         background: `linear-gradient(135deg, var(--color-soil) 0%, var(--color-bark) 100%)`,
         padding: '3.5rem 2rem',
@@ -92,7 +123,7 @@ export default function TripDetailPage() {
         }} />
         <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative' }}>
           <Link href="/dashboard" style={{ color: 'var(--color-sage)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-            ← Back to Dashboard
+            Back to Dashboard
           </Link>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
@@ -117,8 +148,6 @@ export default function TripDetailPage() {
       </div>
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2.5rem 2rem' }}>
-
-        {/* Info cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
           {[
             { icon: '📅', label: 'Start Date', value: formatDate(trip.start_date) },
@@ -134,7 +163,6 @@ export default function TripDetailPage() {
           ))}
         </div>
 
-        {/* Description */}
         {trip.description && (
           <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid var(--color-mist)', marginBottom: '2rem' }}>
             <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', marginBottom: '1rem', fontWeight: 700 }}>
@@ -144,7 +172,49 @@ export default function TripDetailPage() {
           </div>
         )}
 
-        {/* Action buttons */}
+        {/* Photo Upload Section */}
+        <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid var(--color-mist)', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', fontWeight: 700 }}>
+              📸 Trip Photos
+            </h2>
+            <label style={{
+              background: 'var(--color-moss)',
+              color: 'var(--color-cream)',
+              padding: '0.6rem 1.25rem',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+            }}>
+              {uploading ? 'Uploading...' : '+ Add Photos'}
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handlePhotoUpload}
+                style={{ display: 'none' }}
+              />
+            </label>
+          </div>
+
+          {photos.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '3rem', background: 'var(--color-cream)', borderRadius: '12px', border: '2px dashed var(--color-mist)' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📷</div>
+              <p style={{ color: 'var(--color-stone)', fontSize: '0.9rem' }}>No photos yet. Add some memories!</p>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+              {photos.map((url, i) => (
+                <div key={i} style={{ borderRadius: '12px', overflow: 'hidden', aspectRatio: '1', background: 'var(--color-mist)' }}>
+                  <img src={url} alt={`Trip photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           <Link href={`/trips/${id}/edit`} style={{
             background: 'var(--color-soil)',
@@ -156,7 +226,7 @@ export default function TripDetailPage() {
             fontWeight: 700,
             fontSize: '0.95rem',
           }}>
-            ✏️ Edit Trip
+            Edit Trip
           </Link>
           <button onClick={handleShare} style={{
             background: copied ? 'var(--color-moss)' : 'white',
@@ -170,7 +240,7 @@ export default function TripDetailPage() {
             fontSize: '0.95rem',
             transition: 'all 0.2s',
           }}>
-            {copied ? '✅ Link Copied!' : '🔗 Share Trip'}
+            {copied ? 'Link Copied!' : 'Share Trip'}
           </button>
           <button onClick={handleDelete} style={{
             background: 'transparent',
@@ -183,7 +253,7 @@ export default function TripDetailPage() {
             fontWeight: 700,
             fontSize: '0.95rem',
           }}>
-            🗑️ Delete Trip
+            Delete Trip
           </button>
         </div>
       </div>
