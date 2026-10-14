@@ -46,12 +46,12 @@ export default function TripDetailPage() {
 
   const fetchPhotos = async () => {
     const { data } = await supabase.storage
-      .from('trip-photos')
+      .from('trip photos')
       .list(`${id}/`)
     if (data) {
       const urls = data.map(file => {
         const { data: urlData } = supabase.storage
-          .from('trip-photos')
+          .from('trip photos')
           .getPublicUrl(`${id}/${file.name}`)
         return urlData.publicUrl
       })
@@ -66,7 +66,7 @@ export default function TripDetailPage() {
     for (const file of Array.from(files)) {
       const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
 const { error } = await supabase.storage
-  .from('trip-photos')
+  .from('trip photos')
   .upload(`${id}/${fileName}`, file, { cacheControl: '3600', upsert: true })
 if (error) console.error('Upload error:', error)
     }
