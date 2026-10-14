@@ -46,12 +46,12 @@ export default function TripDetailPage() {
 
   const fetchPhotos = async () => {
     const { data } = await supabase.storage
-      .from('trip photos')
+      .from('trip-photos')
       .list(`${id}/`)
     if (data) {
       const urls = data.map(file => {
         const { data: urlData } = supabase.storage
-          .from('trip photos')
+          .from('trip-photos')
           .getPublicUrl(`${id}/${file.name}`)
         return urlData.publicUrl
       })
@@ -66,7 +66,7 @@ export default function TripDetailPage() {
     for (const file of Array.from(files)) {
       const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
 const { error } = await supabase.storage
-  .from('trip photos')
+  .from('trip-photos')
   .upload(`${id}/${fileName}`, file, { cacheControl: '3600', upsert: true })
 if (error) console.error('Upload error:', error)
     }
@@ -177,7 +177,7 @@ if (error) console.error('Upload error:', error)
         <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid var(--color-mist)', marginBottom: '2rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', fontWeight: 700 }}>
-              📸 Trip Photos
+              📸 trip-photos
             </h2>
             <label style={{
               background: 'var(--color-moss)',
