@@ -6,6 +6,7 @@ import { supabase, type Trip } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 import dynamic from 'next/dynamic'
 import Weather from '@/components/Weather'
+import BudgetTracker from '@/components/BudgetTracker'
 
 const MapComponent = dynamic(() => import('@/components/Map'), { ssr: false })
 
@@ -161,12 +162,14 @@ export default function TripDetailPage() {
             </div>
           ))}
         </div>
-<div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid var(--color-mist)', marginBottom: '2rem' }}>
-  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', marginBottom: '1rem', fontWeight: 700 }}>
-    🌤️ Current Weather in {trip.destination}
-  </h2>
-  <Weather destination={trip.destination} />
-</div>
+
+        <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid var(--color-mist)', marginBottom: '2rem' }}>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', marginBottom: '1rem', fontWeight: 700 }}>
+            🌤️ Current Weather in {trip.destination}
+          </h2>
+          <Weather destination={trip.destination} />
+        </div>
+
         <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid var(--color-mist)', marginBottom: '2rem' }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', marginBottom: '1rem', fontWeight: 700 }}>
             🗺️ Destination Map
@@ -216,6 +219,13 @@ export default function TripDetailPage() {
               ))}
             </div>
           )}
+        </div>
+
+        <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid var(--color-mist)', marginBottom: '2rem' }}>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', marginBottom: '1.5rem', fontWeight: 700 }}>
+            💰 Budget Tracker
+          </h2>
+          <BudgetTracker tripId={id} />
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
