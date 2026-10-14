@@ -63,8 +63,9 @@ export default function Navbar() {
           {userEmail ? (
             <>
               <Link href="/dashboard" style={linkStyle}>Dashboard</Link>
-            <Link href="/trips/new" style={linkStyle}>+ New Trip</Link>
-<Link href="/plan" style={linkStyle}>AI Planner</Link>
+              <Link href="/invites" style={linkStyle}>My Invites</Link>
+              <Link href="/trips/new" style={linkStyle}>+ New Trip</Link>
+              <Link href="/plan" style={linkStyle}>AI Planner</Link>
               <span style={{ color: 'var(--color-sand)', fontSize: '0.85rem' }}>
                 {userEmail.split('@')[0]}
               </span>
