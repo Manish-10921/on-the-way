@@ -68,10 +68,9 @@ export default function TripDetailPage() {
     setUploading(true)
     for (const file of Array.from(files)) {
       const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-const { error } = await supabase.storage
-  .from('trip-photos')
-  .upload(`${id}/${fileName}`, file, { cacheControl: '3600', upsert: true })
-if (error) console.error('Upload error:', error)
+      await supabase.storage
+        .from('trip-photos')
+        .upload(`${id}/${fileName}`, file, { cacheControl: '3600', upsert: true })
     }
     await fetchPhotos()
     setUploading(false)
@@ -84,8 +83,7 @@ if (error) console.error('Upload error:', error)
   }
 
   const handleShare = () => {
-    const url = window.location.href
-    navigator.clipboard.writeText(url)
+    navigator.clipboard.writeText(window.location.href)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -120,11 +118,6 @@ if (error) console.error('Upload error:', error)
         position: 'relative',
         overflow: 'hidden',
       }}>
-        <div style={{
-          position: 'absolute', bottom: '-30%', right: '5%',
-          width: '300px', height: '300px', borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(143,166,122,0.15) 0%, transparent 70%)',
-        }} />
         <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative' }}>
           <Link href="/dashboard" style={{ color: 'var(--color-sage)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
             Back to Dashboard
@@ -152,6 +145,7 @@ if (error) console.error('Upload error:', error)
       </div>
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2.5rem 2rem' }}>
+
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
           {[
             { icon: '📅', label: 'Start Date', value: formatDate(trip.start_date) },
@@ -167,28 +161,26 @@ if (error) console.error('Upload error:', error)
           ))}
         </div>
 
+        <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid var(--color-mist)', marginBottom: '2rem' }}>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', marginBottom: '1rem', fontWeight: 700 }}>
+            🗺️ Destination Map
+          </h2>
+          <MapComponent destination={trip.destination} />
+        </div>
+
         {trip.description && (
           <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid var(--color-mist)', marginBottom: '2rem' }}>
             <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', marginBottom: '1rem', fontWeight: 700 }}>
-            
-{/* Map Section */}
-<div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid var(--color-mist)', marginBottom: '2rem' }}>
-  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', marginBottom: '1rem', fontWeight: 700 }}>
-    🗺️ Destination Map
-  </h2>
-  <MapComponent destination={trip.destination} />
-</div>
-📝 Trip Notes
+              📝 Trip Notes
             </h2>
             <p style={{ color: 'var(--color-dusk)', lineHeight: 1.8, fontSize: '0.95rem' }}>{trip.description}</p>
           </div>
         )}
 
-        {/* Photo Upload Section */}
         <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid var(--color-mist)', marginBottom: '2rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', fontWeight: 700 }}>
-              📸 trip-photos
+              📸 Trip Photos
             </h2>
             <label style={{
               background: 'var(--color-moss)',
@@ -201,16 +193,9 @@ if (error) console.error('Upload error:', error)
               fontSize: '0.875rem',
             }}>
               {uploading ? 'Uploading...' : '+ Add Photos'}
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handlePhotoUpload}
-                style={{ display: 'none' }}
-              />
+              <input type="file" accept="image/*" multiple onChange={handlePhotoUpload} style={{ display: 'none' }} />
             </label>
           </div>
-
           {photos.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '3rem', background: 'var(--color-cream)', borderRadius: '12px', border: '2px dashed var(--color-mist)' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📷</div>
