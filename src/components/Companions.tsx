@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import emailjs from '@emailjs/browser'
 
-const EMAILJS_SERVICE_ID = 'service_vShjm87'
+const EMAILJS_SERVICE_ID = service_ki4ngyn
 const EMAILJS_TEMPLATE_ID = 'template_tz51x3g'
 const EMAILJS_PUBLIC_KEY = 'EyUzIbMzCkbEvYfgT'
 
