@@ -64,7 +64,14 @@ export default function Map({ destination }: MapProps) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <Marker position={coords} icon={icon}>
-        <Popup>{destination}</Popup>
+        <Popup>
+  <div>
+    <strong>{destination}</strong><br/>
+    <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`} target="_blank" rel="noopener noreferrer" style={{ color: '#4a5e3a', fontWeight: 600 }}>
+      Get Directions on Google Maps →
+    </a>
+  </div>
+</Popup>
       </Marker>
     </MapContainer>
   )
