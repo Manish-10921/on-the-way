@@ -4,6 +4,9 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase, type Trip } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
+import dynamic from 'next/dynamic'
+
+const MapComponent = dynamic(() => import('@/components/Map'), { ssr: false })
 
 const statusColors: Record<string, string> = {
   planned: 'var(--color-sand)',
@@ -167,7 +170,15 @@ if (error) console.error('Upload error:', error)
         {trip.description && (
           <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid var(--color-mist)', marginBottom: '2rem' }}>
             <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', marginBottom: '1rem', fontWeight: 700 }}>
-              📝 Trip Notes
+              
+{/* Map Section */}
+<div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid var(--color-mist)', marginBottom: '2rem' }}>
+  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', marginBottom: '1rem', fontWeight: 700 }}>
+    🗺️ Destination Map
+  </h2>
+  <MapComponent destination={trip.destination} />
+</div>
+📝 Trip Notes
             </h2>
             <p style={{ color: 'var(--color-dusk)', lineHeight: 1.8, fontSize: '0.95rem' }}>{trip.description}</p>
           </div>
