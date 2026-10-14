@@ -1,6 +1,11 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import emailjs from '@emailjs/browser'
+
+const EMAILJS_SERVICE_ID = 'service_vShjm87'
+const EMAILJS_TEMPLATE_ID = 'template_tz51x3g'
+const EMAILJS_PUBLIC_KEY = 'EyUzIbMzCkbEvYfgT'
 
 interface Companion {
   id: string
@@ -11,9 +16,11 @@ interface Companion {
 
 interface CompanionsProps {
   tripId: string
+  tripTitle?: string
+  destination?: string
 }
 
-export default function Companions({ tripId }: CompanionsProps) {
+export default function Companions({ tripId, tripTitle, destination }: CompanionsProps) {
   const [companions, setCompanions] = useState<Companion[]>([])
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(true)
@@ -57,20 +64,38 @@ export default function Companions({ tripId }: CompanionsProps) {
       return
     }
 
-    const { error } = await supabase.from('trip_companions').insert({
+    const { error: dbError } = await supabase.from('trip_companions').insert({
       trip_id: tripId,
       owner_id: session.user.id,
       companion_email: email,
       status: 'pending',
     })
 
-    if (error) {
-      setError(error.message)
-    } else {
-      setSuccess(`Invitation sent to ${email}!`)
-      setEmail('')
-      fetchCompanions()
+    if (dbError) {
+      setError(dbError.message)
+      setAdding(false)
+      return
     }
+
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          email: email,
+          owner_email: session.user.email,
+          destination: destination || 'an amazing destination',
+          trip_link: `${window.location.origin}/signup`,
+        },
+        EMAILJS_PUBLIC_KEY
+      )
+      setSuccess(`Invitation email sent to ${email}!`)
+    } catch {
+      setSuccess(`${email} added as companion! (Email notification may be delayed)`)
+    }
+
+    setEmail('')
+    fetchCompanions()
     setAdding(false)
   }
 
@@ -83,7 +108,6 @@ export default function Companions({ tripId }: CompanionsProps) {
 
   return (
     <div>
-      {/* Invite form */}
       <form onSubmit={handleInvite} style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
         <input
           type="email"
@@ -132,7 +156,6 @@ export default function Companions({ tripId }: CompanionsProps) {
         </div>
       )}
 
-      {/* Companions list */}
       {companions.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-stone)', background: 'var(--color-cream)', borderRadius: '12px', border: '2px dashed var(--color-mist)' }}>
           <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>👥</div>

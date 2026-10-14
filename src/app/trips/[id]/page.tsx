@@ -233,7 +233,7 @@ export default function TripDetailPage() {
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', marginBottom: '1.5rem', fontWeight: 700 }}>
             👥 Travel Companions
           </h2>
-          <Companions tripId={id} />
+          <Companions tripId={id} tripTitle={trip.title} destination={trip.destination} />
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
