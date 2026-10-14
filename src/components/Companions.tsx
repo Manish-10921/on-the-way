@@ -30,6 +30,8 @@ export default function Companions({ tripId, tripTitle, destination }: Companion
 
   useEffect(() => {
     fetchCompanions()
+    const interval = setInterval(fetchCompanions, 30000)
+    return () => clearInterval(interval)
   }, [tripId])
 
   const fetchCompanions = async () => {
@@ -85,13 +87,13 @@ export default function Companions({ tripId, tripTitle, destination }: Companion
           email: email,
           owner_email: session.user.email,
           destination: destination || 'an amazing destination',
-          trip_link: `${window.location.origin}/signup`,
+          trip_link: `${window.location.origin}/invites`,
         },
         EMAILJS_PUBLIC_KEY
       )
       setSuccess(`Invitation email sent to ${email}!`)
     } catch {
-      setSuccess(`${email} added as companion! (Email notification may be delayed)`)
+      setSuccess(`${email} added as companion!`)
     }
 
     setEmail('')
@@ -166,13 +168,13 @@ export default function Companions({ tripId, tripTitle, destination }: Companion
           {companions.map(companion => (
             <div key={companion.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--color-cream)', borderRadius: '10px', padding: '1rem 1.25rem', border: '1px solid var(--color-mist)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--color-moss)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '1rem' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: companion.status === 'accepted' ? 'var(--color-moss)' : 'var(--color-sand)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '1rem' }}>
                   {companion.companion_email[0].toUpperCase()}
                 </div>
                 <div>
                   <div style={{ fontWeight: 600, color: 'var(--color-soil)', fontSize: '0.95rem' }}>{companion.companion_email}</div>
-                  <div style={{ color: 'var(--color-stone)', fontSize: '0.8rem' }}>
-                    {companion.status === 'pending' ? '⏳ Invitation pending' : '✅ Accepted'}
+                  <div style={{ color: companion.status === 'accepted' ? 'var(--color-moss)' : 'var(--color-stone)', fontSize: '0.8rem', fontWeight: companion.status === 'accepted' ? 600 : 400 }}>
+                    {companion.status === 'accepted' ? '✅ Accepted — joining your trip!' : '⏳ Invitation pending'}
                   </div>
                 </div>
               </div>
