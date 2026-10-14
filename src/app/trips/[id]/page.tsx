@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar'
 import dynamic from 'next/dynamic'
 import Weather from '@/components/Weather'
 import BudgetTracker from '@/components/BudgetTracker'
+import Companions from '@/components/Companions'
 
 const MapComponent = dynamic(() => import('@/components/Map'), { ssr: false })
 
@@ -226,6 +227,13 @@ export default function TripDetailPage() {
             💰 Budget Tracker
           </h2>
           <BudgetTracker tripId={id} />
+        </div>
+
+        <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid var(--color-mist)', marginBottom: '2rem' }}>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--color-soil)', marginBottom: '1.5rem', fontWeight: 700 }}>
+            👥 Travel Companions
+          </h2>
+          <Companions tripId={id} />
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
