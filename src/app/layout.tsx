@@ -15,8 +15,8 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "On The Way — Travel Planner",
-  description: "Plan your journeys, one adventure at a time.",
+  title: "MOT — Memory On Trip",
+  description: "Capture every memory, one trip at a time.",
 };
 
 export default function RootLayout({
